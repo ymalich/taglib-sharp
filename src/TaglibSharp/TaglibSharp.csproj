@@ -16,7 +16,7 @@
 
   <PropertyGroup>
     <Version>$(ReleaseVersion)</Version>
-    <PackageId>TagLibSharp</PackageId>
+    <PackageId>TagLibSharp.MY</PackageId>
     <Product>TagLib#</Product>
     <Description>A library for for reading and writing metadata in media files, including video, audio, and photo formats.</Description>
     <Copyright>Copyright (c) 2006-2007 Brian Nickel.  Copyright (c) 2009-2020 Other contributors</Copyright>

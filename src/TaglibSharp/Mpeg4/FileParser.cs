@@ -297,6 +297,11 @@ namespace TagLib.Mpeg4
 			get { return mdat_end; }
 		}
 
+		/// <summary>
+		///    Contains the "stsd" boxes found in the file.
+		/// </summary>
+		public List<StartEnd> MdatRegions { get; } = new List<StartEnd> ();
+
 		#endregion
 
 
@@ -404,8 +409,12 @@ namespace TagLib.Mpeg4
 					// IsoUserDataBox.ParentTree member.
 					udta_tree = AddParent (parents, header).ToArray ();
 				} else if (header.BoxType == BoxType.Mdat) {
-					mdat_start = position;
+					if (mdat_start < 0) {
+						mdat_start = position;
+					}
+
 					mdat_end = position + header.TotalBoxSize;
+					MdatRegions.Add (new StartEnd(position, position + header.TotalBoxSize));
 				}
 
 				if (header.TotalBoxSize == 0)
@@ -450,8 +459,12 @@ namespace TagLib.Mpeg4
 
 					udta_boxes.Add (udtaBox);
 				} else if (header.BoxType == BoxType.Mdat) {
-					mdat_start = position;
+					if (mdat_start < 0) {
+						mdat_start = position;
+					}
+
 					mdat_end = position + header.TotalBoxSize;
+					MdatRegions.Add (new StartEnd (position, position + header.TotalBoxSize));
 				}
 
 				if (header.TotalBoxSize == 0)
@@ -509,8 +522,12 @@ namespace TagLib.Mpeg4
 
 					udta_boxes.Add (udtaBox);
 				} else if (type == BoxType.Mdat) {
-					mdat_start = position;
+					if (mdat_start < 0) {
+						mdat_start = position;
+					}
+
 					mdat_end = position + header.TotalBoxSize;
+					MdatRegions.Add (new StartEnd (position, position + header.TotalBoxSize));
 				}
 
 				if (header.TotalBoxSize == 0)
@@ -549,8 +566,12 @@ namespace TagLib.Mpeg4
 					header.BoxType == BoxType.Co64) {
 					stco_boxes.Add (BoxFactory.CreateBox (file, header));
 				} else if (header.BoxType == BoxType.Mdat) {
-					mdat_start = position;
+					if (mdat_start < 0) {
+						mdat_start = position;
+					}
+
 					mdat_end = position + header.TotalBoxSize;
+					MdatRegions.Add (new StartEnd (position, position + header.TotalBoxSize));
 				}
 
 				if (header.TotalBoxSize == 0)

@@ -186,6 +186,11 @@ namespace TagLib.Mpeg4
 		/// </summary>
 		protected List<IsoUserDataBox> UdtaBoxes { get; } = new List<IsoUserDataBox> ();
 
+		/// <summary>
+		/// Multiple 'mdta'-regions in mp4 files
+		/// </summary>
+		public List<StartEnd> MdatRegions { get; private set; } = new List<StartEnd> ();
+
 		#endregion
 
 
@@ -372,6 +377,12 @@ namespace TagLib.Mpeg4
 
 				InvariantStartPosition = parser.MdatStartPosition;
 				InvariantEndPosition = parser.MdatEndPosition;
+
+				if (parser.MdatRegions.Count > 0) {
+					InvariantStartPosition = parser.MdatRegions.Min(x => x.StartPosition) ;
+					InvariantEndPosition = parser.MdatRegions.Max (x => x.EndPosition);
+					MdatRegions = parser.MdatRegions;
+				}
 
 				UdtaBoxes.AddRange (parser.UserDataBoxes);
 
