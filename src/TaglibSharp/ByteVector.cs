@@ -265,9 +265,70 @@ namespace TagLib
 			if (length == data.Length) {
 				this.data.AddRange (data);
 			} else {
-				byte[] array = new byte[length];
-				Array.Copy (data, 0, array, 0, length);
-				this.data.AddRange (array);
+				if (this.data.Capacity == 0) {
+					this.data.Capacity = length;
+				}
+
+				for (int i = 0; i < length; i++) {
+					this.data.Add(data[i]);
+				}
+			}
+		}
+
+		/// <summary>
+		///    Constructs and initializes a new instance of <see
+		///    cref="ByteVector" /> by copying a specified number of
+		///    values from a specified <see cref="T:byte[]" />.
+		/// </summary>
+		/// <param name="data">
+		///    A <see cref="T:byte[]" /> containing the bytes to be stored
+		///    in the new instance.
+		/// </param>
+		/// <param name="startIndex">
+		///    A <see cref="int" /> value specifying the start index in the data buffer.
+		/// </param>
+		/// <param name="length">
+		///    A <see cref="int" /> value specifying the number of bytes
+		///    to be copied to the new instance.
+		/// </param>
+		/// <exception cref="ArgumentOutOfRangeException">
+		///    <paramref name="length" /> is less than zero or greater
+		///    than the length of the data.
+		/// </exception>
+		public ByteVector(IList<byte> data, int startIndex, int length)
+		{
+			if (length + startIndex > data.Count)
+				throw new ArgumentOutOfRangeException(nameof(length), "Length exceeds size of data.");
+
+			if (length < 0)
+				throw new ArgumentOutOfRangeException(nameof(length), "Length is less than zero.");
+
+
+			if (this.data.Capacity == 0)
+			{
+				this.data.Capacity = length;
+			}
+
+			for (int i = startIndex; i < startIndex + length; i++)
+			{
+				this.data.Add(data[i]);
+			}
+		}
+
+		/// <summary>
+		///    Constructs and initializes a new instance of <see
+		///    cref="ByteVector" /> by copying a specified number of
+		///    values from a specified <see cref="T:byte[]" />.
+		/// </summary>
+		/// <param name="data">
+		///    A <see cref="T:byte[]" /> containing the bytes to be stored
+		///    in the new instance.
+		/// </param>
+		public ByteVector (IEnumerable<byte> data)
+		{
+			foreach (var b in data)
+			{
+				this.data.Add(b);
 			}
 		}
 
@@ -317,12 +378,8 @@ namespace TagLib
 			if (size == 0)
 				return;
 
-			byte[] data = new byte[size];
-
 			for (int i = 0; i < size; i++)
-				data[i] = value;
-
-			this.data.AddRange (data);
+				data.Add(value);
 		}
 
 		#endregion
@@ -444,11 +501,7 @@ namespace TagLib
 			if (startIndex + length > this.data.Count)
 				length = this.data.Count - startIndex;
 
-			byte[] data = new byte[length];
-
-			this.data.CopyTo (startIndex, data, 0, length);
-
-			return data;
+			return new ByteVector(this.data, startIndex, length);
 		}
 
 		/// <summary>

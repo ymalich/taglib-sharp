@@ -29,6 +29,7 @@
 //
 
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -162,6 +163,8 @@ namespace TagLib
 
 
 		#region Private Properties
+
+		private static ArrayPool<byte> SharedBuffers = ArrayPool<byte>.Create(2 *1024 * 1024, 8);
 
 		/// <summary>
 		///    Contains the current stream used in reading/writing.
@@ -627,18 +630,22 @@ namespace TagLib
 
 			Mode = AccessMode.Read;
 
-			byte[] buffer = new byte[length];
+			byte[] buffer = SharedBuffers.Rent(length);
 
-			int count = 0, read = 0, needed = length;
+			try {
+				int count = 0, read = 0, needed = length;
 
-			do {
-				count = file_stream.Read (buffer, read, needed);
+				do {
+					count = file_stream.Read (buffer, read, needed);
 
-				read += count;
-				needed -= count;
-			} while (needed > 0 && count != 0);
+					read += count;
+					needed -= count;
+				} while (needed > 0 && count != 0);
 
-			return new ByteVector (buffer, read);
+				return new ByteVector (buffer, read);
+			}finally {
+				SharedBuffers.Return (buffer);
+			}
 		}
 
 		/// <summary>
@@ -1321,6 +1328,14 @@ namespace TagLib
 		{
 			if (resolver != null)
 				file_type_resolvers.Insert (0, resolver);
+		}
+
+		/// <summary>
+		///    Clear shared ArrayPool buffers to free unused buffers memory for GC.
+		/// </summary>
+		public static void ClearSharedBuffers()
+		{
+			SharedBuffers = ArrayPool<byte>.Create ();
 		}
 
 		#endregion

@@ -30,6 +30,11 @@ July 22, 2019
 
 January 21, 2019
 * Lots and lots of updates including net45 and .netstandard 2.0</PackageReleaseNotes>
+    <RepositoryUrl>https://github.com/ymalich/taglib-sharp</RepositoryUrl>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.4" />
+  </ItemGroup>
 
 </Project>
