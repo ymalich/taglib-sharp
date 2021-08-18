@@ -1097,7 +1097,7 @@ namespace TagLib.Id3v2
 		/// TXXX frame</param>
 		/// <param name="text">String containing the Text field for the TXXX frame</param>
 		/// <param name="caseSensitive">case-sensitive search if true.</param>
-		void SetUserTextAsString (string description, string text, bool caseSensitive)
+		public void SetUserTextAsString (string description, string text, bool caseSensitive)
 		{
 			//Get the TXXX frame, create a new one if needed
 			var frame = UserTextInformationFrame.Get (this, description, DefaultEncoding, true, caseSensitive);
@@ -1117,7 +1117,7 @@ namespace TagLib.Id3v2
 		/// <param name="description">String containing the Description field for the
 		/// TXXX frame</param>
 		/// <param name="text">String containing the Text field for the TXXX frame</param>
-		void SetUserTextAsString (string description, string text)
+		public void SetUserTextAsString (string description, string text)
 		{
 			SetUserTextAsString (description, text, true);
 		}
@@ -1705,7 +1705,7 @@ namespace TagLib.Id3v2
 		/// </remarks>
 		public override uint TrackCount {
 			get { return GetTextAsUInt32 (FrameType.TRCK, 1); }
-			set { SetNumberFrame (FrameType.TRCK, Track, value); }
+			set { SetNumberFrame (FrameType.TRCK, Track, value, "00"); }
 		}
 
 		/// <summary>
@@ -1909,7 +1909,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzArtistId {
-			get { return GetUserTextAsString ("MusicBrainz Artist Id"); }
+			get { return GetUserTextAsString ("MusicBrainz Artist Id", false); }
 			set { SetUserTextAsString ("MusicBrainz Artist Id", value); }
 		}
 
@@ -1926,7 +1926,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzReleaseGroupId {
-			get { return GetUserTextAsString ("MusicBrainz Release Group Id"); }
+			get { return GetUserTextAsString ("MusicBrainz Release Group Id", false); }
 			set { SetUserTextAsString ("MusicBrainz Release Group Id", value); }
 		}
 
@@ -1943,7 +1943,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzReleaseId {
-			get { return GetUserTextAsString ("MusicBrainz Album Id"); }
+			get { return GetUserTextAsString ("MusicBrainz Album Id", false); }
 			set { SetUserTextAsString ("MusicBrainz Album Id", value); }
 		}
 
@@ -1960,7 +1960,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzReleaseArtistId {
-			get { return GetUserTextAsString ("MusicBrainz Album Artist Id"); }
+			get { return GetUserTextAsString ("MusicBrainz Album Artist Id", false); }
 			set { SetUserTextAsString ("MusicBrainz Album Artist Id", value); }
 		}
 
@@ -1994,7 +1994,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzDiscId {
-			get { return GetUserTextAsString ("MusicBrainz Disc Id"); }
+			get { return GetUserTextAsString ("MusicBrainz Disc Id", false); }
 			set { SetUserTextAsString ("MusicBrainz Disc Id", value); }
 		}
 
@@ -2045,7 +2045,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzReleaseStatus {
-			get { return GetUserTextAsString ("MusicBrainz Album Status"); }
+			get { return GetUserTextAsString ("MusicBrainz Album Status", false); }
 			set { SetUserTextAsString ("MusicBrainz Album Status", value); }
 		}
 
@@ -2062,7 +2062,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzReleaseType {
-			get { return GetUserTextAsString ("MusicBrainz Album Type"); }
+			get { return GetUserTextAsString ("MusicBrainz Album Type", false); }
 			set { SetUserTextAsString ("MusicBrainz Album Type", value); }
 		}
 
@@ -2079,7 +2079,7 @@ namespace TagLib.Id3v2
 		///    http://musicbrainz.org/doc/PicardTagMapping
 		/// </remarks>
 		public override string MusicBrainzReleaseCountry {
-			get { return GetUserTextAsString ("MusicBrainz Album Release Country"); }
+			get { return GetUserTextAsString ("MusicBrainz Album Release Country", false); }
 			set { SetUserTextAsString ("MusicBrainz Album Release Country", value); }
 		}
 
