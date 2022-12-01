@@ -27,3 +27,4 @@ packages
 TestResult.xml
 src/TaglibSharp.Tests/samples/tmp*
 *.sln.DotSettings.user
+/_ReSharper.Caches/ReSharperPlatformVs17222_602244e9.TaglibSharp.00
