@@ -12,7 +12,7 @@
 // Copyright (C) 2005, 2007 Brian Nickel
 // Copyright (C) 2006 Novell, Inc.
 // Copyright (C) 2002,2003 Scott Wheeler (Original Implementation)
-// 
+//
 // This library is free software; you can redistribute it and/or modify
 // it  under the terms of the GNU Lesser General Public License version
 // 2.1 as published by the Free Software Foundation.
@@ -28,12 +28,9 @@
 // USA
 //
 
-using System;
 using System.Buffers;
-using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
-using System.Runtime.Serialization;
+using System.Runtime.ExceptionServices;
 
 namespace TagLib
 {
@@ -57,10 +54,10 @@ namespace TagLib
 		Average = 2,
 
 		/// <summary>
-		///    Use the <see cref="PictureLazy"/> class in the 
-		///    the property <see cref="Tag.Pictures"/>. 
+		///    Use the <see cref="PictureLazy"/> class in the
+		///    the property <see cref="Tag.Pictures"/>.
 		///    This will avoid loading picture content when reading the Tag.
-		///    Picture will be read lazily, when the picture content is 
+		///    Picture will be read lazily, when the picture content is
 		///    accessed.
 		/// </summary>
 		PictureLazy = 4
@@ -149,7 +146,7 @@ namespace TagLib
 		///    methods.</para>
 		///    <para>If the resolver returns a new <see cref="File" />,
 		///    it will instantly be returned, by <see
-		///    cref="Create(string)" />. If it returns <see 
+		///    cref="Create(string)" />. If it returns <see
 		///    langword="null" />, <see cref="Create(string)" /> will
 		///    continue to process. If the resolver throws an exception
 		///    it will be uncaught.</para>
@@ -529,15 +526,15 @@ namespace TagLib
 		///   TagLib.Id3v2.Tag id3 = file.GetTag (TagLib.TagTypes.Id3v2, true);
 		///   if (id3 != null)
 		///      id3.SetTextFrame ("TMOO", moods);
-		///   
+		///
 		///   TagLib.Asf.Tag asf = file.GetTag (TagLib.TagTypes.Asf, true);
 		///   if (asf != null)
 		///      asf.SetDescriptorStrings (moods, "WM/Mood", "Mood");
-		///   
+		///
 		///   TagLib.Ape.Tag ape = file.GetTag (TagLib.TagTypes.Ape);
 		///   if (ape != null)
 		///      ape.SetValue ("MOOD", moods);
-		///      
+		///
 		///   // Whatever tag types you want...
 		///}</code>
 		/// </example>
@@ -575,23 +572,23 @@ namespace TagLib
 		///      if (f != null)
 		///         return f.FieldList.ToArray ();
 		///   }
-		///   
+		///
 		///   TagLib.Asf.Tag asf = file.GetTag (TagLib.TagTypes.Asf);
 		///   if (asf != null) {
 		///      string [] value = asf.GetDescriptorStrings ("WM/Mood", "Mood");
 		///      if (value.Length &gt; 0)
 		///         return value;
 		///   }
-		///   
+		///
 		///   TagLib.Ape.Tag ape = file.GetTag (TagLib.TagTypes.Ape);
 		///   if (ape != null) {
 		///      Item item = ape.GetItem ("MOOD");
 		///      if (item != null)
 		///         return item.ToStringArray ();
 		///   }
-		///      
+		///
 		///   // Whatever tag types you want...
-		///   
+		///
 		///   return new string [] {};
 		///}</code>
 		/// </example>
@@ -838,7 +835,7 @@ namespace TagLib
 			*/
 
 			// Save the location of the current read pointer.  We
-			// will restore the position using Seek() before all 
+			// will restore the position using Seek() before all
 			// returns.
 
 			long original_position = file_stream.Position;
@@ -992,7 +989,7 @@ namespace TagLib
 		/// <summary>
 		///   Inserts a specified block-size into the file repesented
 		///   by the current instance at a specified location. Former
-		///   data at this location is not overwriten and may then 
+		///   data at this location is not overwriten and may then
 		///   contain random content.
 		/// </summary>
 		/// <param name="size">
@@ -1006,8 +1003,8 @@ namespace TagLib
 		/// <remarks>
 		///    This method is usefull to reserve some space in the file.
 		///    To insert or replace defined data blocks, use <see
-		///    cref="Insert(ByteVector,long)" /> or 
-		///    <see cref="Insert(ByteVector,long,long)"/> 
+		///    cref="Insert(ByteVector,long)" /> or
+		///    <see cref="Insert(ByteVector,long,long)"/>
 		/// </remarks>
 		public void Insert (long size, long start)
 		{
@@ -1243,6 +1240,37 @@ namespace TagLib
 		}
 
 		/// <summary>
+		/// Returns true if the file is supported
+		/// </summary>
+		/// <param name="path">The file path</param>
+		/// <returns>True if supported, false otherwise</returns>
+		public static bool IsSupportedFile (string path)
+		{
+			var abstraction = new LocalFileAbstraction (path);
+
+			return IsSupportedFile (abstraction);
+		}
+
+		private static bool IsSupportedFile(IFileAbstraction abstraction)
+		{
+			string mimetype = GetMimeType (abstraction);
+
+			return FileTypes.AvailableTypes.ContainsKey (mimetype);
+		}
+
+		private static string GetMimeType (IFileAbstraction abstraction)
+		{
+			string ext = string.Empty;
+
+			int index = abstraction.Name.LastIndexOf (".") + 1;
+
+			if (index >= 1 && index < abstraction.Name.Length)
+				ext = abstraction.Name.Substring (index, abstraction.Name.Length - index);
+
+			return $"taglib/{ext.ToLower (CultureInfo.InvariantCulture)}";
+		}
+
+		/// <summary>
 		///    Creates a new instance of a <see cref="File" /> subclass
 		///    for a specified file abstraction, mime-type, and read
 		///    style.
@@ -1276,16 +1304,7 @@ namespace TagLib
 		/// </exception>
 		public static File Create (IFileAbstraction abstraction, string mimetype, ReadStyle propertiesStyle)
 		{
-			if (mimetype == null) {
-				string ext = string.Empty;
-
-				int index = abstraction.Name.LastIndexOf (".") + 1;
-
-				if (index >= 1 && index < abstraction.Name.Length)
-					ext = abstraction.Name.Substring (index, abstraction.Name.Length - index);
-
-				mimetype = "taglib/" + ext.ToLower (CultureInfo.InvariantCulture);
-			}
+			mimetype ??= GetMimeType (abstraction);
 
 			foreach (var resolver in file_type_resolvers) {
 				var file = resolver (abstraction, mimetype, propertiesStyle);
@@ -1294,7 +1313,7 @@ namespace TagLib
 					return file;
 			}
 
-			if (!FileTypes.AvailableTypes.ContainsKey (mimetype))
+			if (!IsSupportedFile(abstraction))
 				throw new UnsupportedFormatException (
 					string.Format (CultureInfo.InvariantCulture, "{0} ({1})", abstraction.Name, mimetype));
 
@@ -1306,8 +1325,15 @@ namespace TagLib
 				file.MimeType = mimetype;
 				return file;
 			} catch (System.Reflection.TargetInvocationException e) {
-				PrepareExceptionForRethrow (e.InnerException);
+#if NETSTANDARD2_0
+				// .NET Standard 2.0: Stack trace will be lost when rethrowing inner exception.
+				// This is a limitation of .NET Standard 2.0.
 				throw e.InnerException;
+#else
+				// Modern .NET: preserve stack trace
+				ExceptionDispatchInfo.Capture (e.InnerException).Throw ();
+				throw; // Unreachable, but required for compiler
+#endif
 			}
 		}
 
@@ -1320,7 +1346,7 @@ namespace TagLib
 		///    file type recognition stack.
 		/// </param>
 		/// <remarks>
-		///    A <see cref="FileTypeResolver" /> adds support for 
+		///    A <see cref="FileTypeResolver" /> adds support for
 		///    recognizing a file type outside of the standard mime-type
 		///    methods.
 		/// </remarks>
@@ -1345,7 +1371,7 @@ namespace TagLib
 		#region Private/Protected Methods
 
 		/// <summary>
-		///    Prepare to Save the file. Thismust be called at the begining 
+		///    Prepare to Save the file. Thismust be called at the begining
 		///    of every File.Save() method.
 		/// </summary>
 		protected void PreSave ()
@@ -1376,7 +1402,7 @@ namespace TagLib
 		/// <param name="data">
 		///    A <see cref="ByteVector" /> object containing the data to
 		///    insert into the file. if null, no data is writen to the
-		///    file and the block is just inserted without overwriting the 
+		///    file and the block is just inserted without overwriting the
 		///    former data at the given location.
 		/// </param>
 		/// <param name="size">
@@ -1444,8 +1470,8 @@ namespace TagLib
 			byte[] buffer;
 			byte[] about_to_overwrite;
 
-			// This is basically a special case of the loop below.  
-			// Here we're just doing the same steps as below, but 
+			// This is basically a special case of the loop below.
+			// Here we're just doing the same steps as below, but
 			// since we aren't using the same buffer size -- instead
 			// we're using the tag size -- this has to be handled as
 			// a special case.  We're also using File::writeBlock()
@@ -1469,12 +1495,12 @@ namespace TagLib
 				about_to_overwrite.Length);
 
 			// Ok, here's the main loop.  We want to loop until the
-			// read fails, which means that we hit the end of the 
+			// read fails, which means that we hit the end of the
 			// file.
 
 			while (buffer_length != 0) {
 				// Seek to the current read position and read
-				// the data that we're about to overwrite. 
+				// the data that we're about to overwrite.
 				// Appropriately increment the readPosition.
 
 				file_stream.Position = read_position;
@@ -1520,24 +1546,7 @@ namespace TagLib
 			Mode = old_mode;
 		}
 
-		/// <summary>
-		/// Causes the original strack trace of the exception to be preserved when it is rethrown
-		/// </summary>
-		/// <param name="ex"></param>
-		static void PrepareExceptionForRethrow (Exception ex)
-		{
-			var ctx = new StreamingContext (StreamingContextStates.CrossAppDomain);
-			var mgr = new ObjectManager (null, ctx);
-			var si = new SerializationInfo (ex.GetType (), new FormatterConverter ());
-
-			ex.GetObjectData (si, ctx);
-			mgr.RegisterObject (ex, 1, si); // prepare for SetObjectData
-			mgr.DoFixups (); // ObjectManager calls SetObjectData
-		}
-
 		#endregion
-
-
 
 		#region Classes
 
@@ -1662,7 +1671,7 @@ namespace TagLib
 		///         return;
 		///
 		///      Gnome.Vfs.Vfs.Initialize ();
-		///      
+		///
 		///      try {
 		///          TagLib.File file = TagLib.File.Create (
 		///             new VfsFileAbstraction (args [0]));
@@ -1703,24 +1712,24 @@ namespace TagLib
 		///import Gnome.Vfs from "gnome-vfs-sharp"
 		///
 		///class VfsFileAbstraction (TagLib.File.IFileAbstraction):
-		///        
+		///
 		///        _name as string
-		///        
+		///
 		///        def constructor(file as string):
 		///                _name = file
-		///        
+		///
 		///        Name:
 		///                get:
 		///                        return _name
-		///                
+		///
 		///        ReadStream:
 		///                get:
 		///                        return VfsStream(_name, FileMode.Open)
-		///                
+		///
 		///        WriteStream:
 		///                get:
 		///                        return VfsStream(_name, FileMode.Open)
-		///        
+		///
 		///if len(argv) == 1:
 		///        Vfs.Initialize()
 		///
@@ -1737,7 +1746,7 @@ namespace TagLib
 			///    implementation.
 			/// </summary>
 			/// <value>
-			///    A <see cref="string" /> object containing the 
+			///    A <see cref="string" /> object containing the
 			///    name or identifier used by the implementation.
 			/// </value>
 			/// <remarks>

@@ -1,0 +1,10 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageVersion Include="MSTest" Version="3.9.1" />
+    <PackageVersion Include="SixLabors.ImageSharp" Version="2.1.10" />
+    <PackageVersion Include="System.Buffers" Version="4.6.1" />
+  </ItemGroup>
+</Project>
