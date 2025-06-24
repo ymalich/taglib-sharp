@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>$(LibTargetFrameworks)</TargetFrameworks>
@@ -14,13 +14,14 @@
 	</PropertyGroup>
 
   <PropertyGroup>
-    <Version>$(ReleaseVersion)</Version>
-    <PackageId>TagLibSharp.MY</PackageId>
-    <Product>TagLib#</Product>
+    <VersionPrefix>$(ReleaseVersion)</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <PackageId>TagLibSharp.DuplicateSearcher</PackageId>
+    <Product>TagLib# for DuplicateSearcher</Product>
     <Description>A library for for reading and writing metadata in media files, including video, audio, and photo formats.</Description>
     <Copyright>Copyright (c) 2006-2007 Brian Nickel.  Copyright (c) 2009-2022 Other contributors</Copyright>
     <Authors>Brian Nickel, Gabriel Burt, Stephen Shaw, etc</Authors>
-    <PackageProjectUrl>https://github.com/mono/taglib-sharp</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/ymalich/taglib-sharp</PackageProjectUrl>
     <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
     <PackageReleaseNotes>Version $(ReleaseVersion)
 July 29, 2022

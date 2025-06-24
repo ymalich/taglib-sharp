@@ -304,6 +304,11 @@ namespace TagLib.IFD
 				ushort entry_tag = entry_data.Mid (0, 2).ToUShort (is_bigendian);
 				ushort type = entry_data.Mid (2, 2).ToUShort (is_bigendian);
 				uint value_count = entry_data.Mid (4, 4).ToUInt (is_bigendian);
+				if (value_count > 100)
+				{
+					continue; // Skip entries with a value count greater than 100, as these are likely invalid.
+				}
+
 				ByteVector offset_data = entry_data.Mid (8, 4);
 
 				IFDEntry entry;

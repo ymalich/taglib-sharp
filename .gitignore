@@ -401,3 +401,7 @@ FodyWeavers.xsd
 
 tests/TaglibSharp.Tests/samples
 /_ReSharper.Caches/ReSharperPlatformVs17222_602244e9.TaglibSharp.00
+/clear_bin.cmd
+/clear_bin_here.cmd
+/clear_obj.cmd
+/clear_obj_here.cmd
